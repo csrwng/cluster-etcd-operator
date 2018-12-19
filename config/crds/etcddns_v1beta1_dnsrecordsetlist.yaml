@@ -1,0 +1,71 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: dnsrecordsetlists.etcddns.operator.openshift.io
+spec:
+  group: etcddns.operator.openshift.io
+  names:
+    kind: DNSRecordSetList
+    plural: dnsrecordsetlists
+  scope: Namespaced
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          type: string
+        items:
+          items:
+            properties:
+              apiVersion:
+                type: string
+              kind:
+                type: string
+              metadata:
+                type: object
+              spec:
+                properties:
+                  endpoints:
+                    items:
+                      properties:
+                        dnsName:
+                          type: string
+                        labels:
+                          type: object
+                        providerSpecific:
+                          type: object
+                        recordTTL:
+                          format: int64
+                          type: integer
+                        recordType:
+                          type: string
+                        targets:
+                          items:
+                            type: string
+                          type: array
+                      type: object
+                    type: array
+                type: object
+              status:
+                properties:
+                  observedGeneration:
+                    format: int64
+                    type: integer
+                type: object
+            type: object
+          type: array
+        kind:
+          type: string
+        metadata:
+          type: object
+      required:
+      - items
+  version: v1beta1
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

@@ -1,0 +1,9 @@
+apiVersion: etcddns.operator.openshift.io/v1beta1
+kind: DNSRecordSet
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: dnsrecordset-sample
+spec:
+  # Add fields here
+  foo: bar
