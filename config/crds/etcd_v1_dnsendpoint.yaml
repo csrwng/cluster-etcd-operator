@@ -11,6 +11,8 @@ spec:
     kind: DNSEndpoint
     plural: dnsendpoints
   scope: Namespaced
+  subresources:
+    status: {}
   validation:
     openAPIV3Schema:
       properties:
@@ -27,8 +29,43 @@ spec:
         metadata:
           type: object
         spec:
+          properties:
+            endpoints:
+              description: Endpoints is the list of DNS records to create/update
+              items:
+                properties:
+                  dnsName:
+                    description: The hostname of the DNS record
+                    type: string
+                  labels:
+                    description: Labels stores labels defined for the Endpoint
+                    type: object
+                  providerSpecific:
+                    description: ProviderSpecific stores provider specific config
+                    type: object
+                  recordTTL:
+                    description: TTL for the record
+                    format: int64
+                    type: integer
+                  recordType:
+                    description: RecordType type of record, e.g. CNAME, A, SRV, TXT
+                      etc
+                    type: string
+                  targets:
+                    description: The targets the DNS record points to
+                    items:
+                      type: string
+                    type: array
+                type: object
+              type: array
           type: object
         status:
+          properties:
+            observedGeneration:
+              description: ObservedGeneration is the generation observed by the external-dns
+                controller.
+              format: int64
+              type: integer
           type: object
   version: v1
 status:

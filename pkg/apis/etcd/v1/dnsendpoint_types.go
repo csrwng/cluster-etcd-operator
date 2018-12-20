@@ -20,19 +20,47 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
 // DNSEndpointSpec defines the desired state of DNSEndpoint
 type DNSEndpointSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// Endpoints is the list of DNS records to create/update
+	Endpoints []*Endpoint `json:"endpoints,omitempty"`
 }
 
 // DNSEndpointStatus defines the observed state of DNSEndpoint
 type DNSEndpointStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// ObservedGeneration is the generation observed by the external-dns controller.
+	// +optional
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+}
+
+// TTL is the time to live of DNS records
+type TTL int64
+
+// Targets is the set of values associated with a DNS record
+type Targets []string
+
+// Labels is a set of labels associated with a DNS record
+type EndpointLabels map[string]string
+
+// ProviderSpecific contains cloud provider specific configuration for a DNS record
+type ProviderSpecific map[string]string
+
+// Endpoint represents a single DNS record
+type Endpoint struct {
+	// The hostname of the DNS record
+	DNSName string `json:"dnsName,omitempty"`
+	// The targets the DNS record points to
+	Targets Targets `json:"targets,omitempty"`
+	// RecordType type of record, e.g. CNAME, A, SRV, TXT etc
+	RecordType string `json:"recordType,omitempty"`
+	// TTL for the record
+	RecordTTL TTL `json:"recordTTL,omitempty"`
+	// Labels stores labels defined for the Endpoint
+	// +optional
+	Labels EndpointLabels `json:"labels,omitempty"`
+	// ProviderSpecific stores provider specific config
+	// +optional
+	ProviderSpecific ProviderSpecific `json:"providerSpecific,omitempty"`
 }
 
 // +genclient
@@ -40,6 +68,7 @@ type DNSEndpointStatus struct {
 
 // DNSEndpoint is the Schema for the dnsendpoints API
 // +k8s:openapi-gen=true
+// +kubebuilder:subresource:status
 type DNSEndpoint struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
