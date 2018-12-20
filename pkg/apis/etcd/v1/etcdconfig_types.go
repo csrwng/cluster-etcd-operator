@@ -17,22 +17,32 @@ limitations under the License.
 package v1
 
 import (
+	operatorsv1 "github.com/openshift/api/operator/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
 // EtcdConfigSpec defines the desired state of EtcdConfig
 type EtcdConfigSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// managementState indicates whether and how the operator should manage the component
+	ManagementState operatorsv1.ManagementState `json:"managementState"`
+
+	// dnsConfig specifies configuration for etcd DNS entry management
+	DNSConfig DNSConfig `json:"dnsConfig"`
+}
+
+type DNSConfig struct {
+	// logLevel is the level of logging for the external-dns controller
+	// Valid values: debug, info, warning, error, fatal
+	LogLevel string `json:"logLevel,omitempty"`
+
+	// automaticUpdates indicates that the DNS entries should be automatically
+	// updated based on the IP address of master Machine resources
+	AutomaticUpdates bool `json:"automaticUpdates"`
 }
 
 // EtcdConfigStatus defines the observed state of EtcdConfig
 type EtcdConfigStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	operatorsv1.OperatorStatus `json:",inline"`
 }
 
 // +genclient
@@ -40,6 +50,8 @@ type EtcdConfigStatus struct {
 
 // EtcdConfig is the Schema for the etcdconfigs API
 // +k8s:openapi-gen=true
+// +kubebuilder:subresource:status
+// +genclient:nonNamespaced
 type EtcdConfig struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
