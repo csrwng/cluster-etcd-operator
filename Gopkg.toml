@@ -20,16 +20,44 @@ required = [
 [prune]
   go-tests = true
 
-
-# STANZAS BELOW ARE GENERATED AND MAY BE WRITTEN - DO NOT MODIFY BELOW THIS LINE.
-
-[[constraint]]
+[[override]]
   name="sigs.k8s.io/controller-runtime"
-  version="v0.1.8"
+  version="<=v0.1.7"
 
 [[constraint]]
   name="sigs.k8s.io/controller-tools"
   version="v0.1.8"
+
+[[override]]
+  name = "k8s.io/code-generator"
+  version = "kubernetes-1.11.0"
+
+[[override]]
+  name = "k8s.io/api"
+  version = "kubernetes-1.11.0"
+
+[[override]]
+  name = "k8s.io/apiextensions-apiserver"
+  version = "kubernetes-1.11.0"
+
+[[override]]
+  name = "k8s.io/apimachinery"
+  version = "kubernetes-1.11.0"
+
+[[override]]
+  name = "k8s.io/kube-aggregator"
+  version = "kubernetes-1.11.0"
+
+[[override]]
+  name = "k8s.io/client-go"
+  version = "kubernetes-1.11.0"
+
+[[override]]
+  name = "k8s.io/apiserver"
+  version = "kubernetes-1.11.0"
+
+# STANZAS BELOW ARE GENERATED AND MAY BE WRITTEN - DO NOT MODIFY BELOW THIS LINE.
+
 
 # For dependency below: Refer to issue https://github.com/golang/dep/issues/1799
 [[override]]
