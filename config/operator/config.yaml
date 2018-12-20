@@ -1,0 +1,9 @@
+apiVersion: etcd.operator.openshift.io/v1alpha1
+kind: EtcdConfig
+metadata:
+  name: instance
+spec:
+  managementState: Managed
+  dnsConfig:
+    automaticUpdates: true
+    logLevel: info

@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: external-dns
+  namespace: openshift-etcd-dns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: external-dns
+  template:
+    metadata:
+      labels:
+        name: external-dns
+    spec:
+      strategy:
+        type: Recreate
+      serviceAccountName: external-dns
+      priorityClassName: system-cluster-critical
+      containers:
+      - name: external-dns
+        image: quay.io/openshift/external-dns:latest
+        args:
+        - --source=crd
+        - --crd-source-apiversion=etcd.operator.openshift.io/v1
+        - --crd-source-kind=DNSEndpoint
+        - --registry=noop
+        - --policy=upsert-only
+        - --namespace=openshift-etcd-dns
+

@@ -41,6 +41,12 @@ vet:
 generate:
 	go generate ./pkg/... ./cmd/...
 
+verify-bindata:
+	hack/verify-bindata.sh
+
+generate-bindata:
+	hack/update-bindata.sh
+
 # Build the docker image
 docker-build: test
 	docker build . -t ${IMG}
