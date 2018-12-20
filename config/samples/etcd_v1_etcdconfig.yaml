@@ -1,0 +1,9 @@
+apiVersion: etcd.operator.openshift.io/v1
+kind: EtcdConfig
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: etcdconfig-sample
+spec:
+  # Add fields here
+  foo: bar
