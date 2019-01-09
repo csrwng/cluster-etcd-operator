@@ -1,17 +1,11 @@
-# Build the manager binary
-FROM golang:1.10.3 as builder
+FROM registry.svc.ci.openshift.org/openshift/release:golang-1.10 AS builder
+RUN mkdir -p /go/src/github.com/openshift/master-dns-operator
+WORKDIR /go/src/github.com/openshift/master-dns-operator
+COPY . .
+RUN go build -o bin/operator ./cmd/operator
 
-# Copy in the go src
-WORKDIR /go/src/github.com/openshift/cluster-etcd-operator
-COPY pkg/    pkg/
-COPY cmd/    cmd/
-COPY vendor/ vendor/
-
-# Build
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o manager github.com/openshift/cluster-etcd-operator/cmd/manager
-
-# Copy the controller-manager into a thin image
-FROM ubuntu:latest
-WORKDIR /
-COPY --from=builder /go/src/github.com/openshift/cluster-etcd-operator/manager .
-ENTRYPOINT ["/manager"]
+FROM registry.svc.ci.openshift.org/openshift/origin-v4.0:base
+COPY --from=builder /go/src/github.com/openshift/master-dns-operator/bin/manager /
+COPY ./manifests /manifests
+ENTRYPOINT /manager
+LABEL io.openshift.release.operator true

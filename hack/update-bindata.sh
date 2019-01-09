@@ -12,6 +12,7 @@ go build -o ./bin/go-bindata ./vendor/github.com/jteeuwen/go-bindata/go-bindata
 
 "./bin/go-bindata" \
 	-nocompress \
+	-nometadata \
 	-pkg "assets" \
 	-o "${OUTPUT_FILE}" \
 	-ignore "OWNERS" \

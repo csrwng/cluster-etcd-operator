@@ -56,6 +56,18 @@ required = [
   name = "k8s.io/apiserver"
   version = "kubernetes-1.11.0"
 
+[[constraint]]
+  name = "github.com/operator-framework/operator-sdk"
+  branch = "master"
+
+[[constraint]]
+  name = "github.com/jteeuwen/go-bindata"
+  revision = "a0ff2567cfb70903282db057e799fd826784d41d"
+
+[[constraint]]
+  name = "github.com/openshift/api"
+  branch = "master"
+
 # STANZAS BELOW ARE GENERATED AND MAY BE WRITTEN - DO NOT MODIFY BELOW THIS LINE.
 
 

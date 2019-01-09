@@ -2,32 +2,22 @@
 # Image URL to use all building/pushing image targets
 IMG ?= controller:latest
 
-all: test manager
+all: fmt vet lint build
 
 # Run tests
-test: generate fmt vet manifests
+test-unit:
 	go test ./pkg/... ./cmd/... -coverprofile cover.out
 
-# Build manager binary
-manager: generate fmt vet
-	go build -o bin/manager github.com/openshift/cluster-etcd-operator/cmd/manager
+verify: verify-bindata verify-gofmt vet
 
-# Run against the configured Kubernetes cluster in ~/.kube/config
-run: generate fmt vet
-	go run ./cmd/manager/main.go
-
-# Install CRDs into a cluster
-install: manifests
-	kubectl apply -f config/crds
+# Build operator binary
+build: generate
+	go build -o bin/operator github.com/openshift/cluster-etcd-operator/cmd/operator
 
 # Deploy controller in the configured Kubernetes cluster in ~/.kube/config
 deploy: manifests
 	kubectl apply -f config/crds
 	kustomize build config/default | kubectl apply -f -
-
-# Generate manifests e.g. CRD, RBAC etc.
-manifests:
-	go run vendor/sigs.k8s.io/controller-tools/cmd/controller-gen/main.go all
 
 # Run go fmt against code
 fmt:
@@ -37,9 +27,16 @@ fmt:
 vet:
 	go vet ./pkg/... ./cmd/...
 
+# Install manifests on cluster
+install:
+	kubectl apply -f ./config/crds
+
 # Generate code
-generate:
+generate: generate-bindata generate-crds
 	go generate ./pkg/... ./cmd/...
+
+verify-gofmt:
+	hack/verify-gofmt.sh
 
 verify-bindata:
 	hack/verify-bindata.sh
@@ -47,8 +44,11 @@ verify-bindata:
 generate-bindata:
 	hack/update-bindata.sh
 
+generate-crds:
+	go run ./vendor/sigs.k8s.io/controller-tools/cmd/controller-gen crd
+
 # Build the docker image
-docker-build: test
+docker-build:
 	docker build . -t ${IMG}
 	@echo "updating kustomize image patch file for manager resource"
 	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
@@ -56,3 +56,7 @@ docker-build: test
 # Push the docker image
 docker-push:
 	docker push ${IMG}
+
+# Utility target to run operator
+run:
+	WATCH_NAMESPACE=openshift-cluster-etcd-dns IMAGE=quay.io/csrwng/external-dns:latest ./bin/operator

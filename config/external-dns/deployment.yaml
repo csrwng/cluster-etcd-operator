@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: external-dns
-  namespace: openshift-etcd-dns
+  namespace: openshift-cluster-etcd-dns
 spec:
   replicas: 1
   selector:

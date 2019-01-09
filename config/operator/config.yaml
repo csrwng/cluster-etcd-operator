@@ -1,4 +1,4 @@
-apiVersion: etcd.operator.openshift.io/v1alpha1
+apiVersion: etcd.operator.openshift.io/v1
 kind: EtcdConfig
 metadata:
   name: instance

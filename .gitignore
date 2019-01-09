@@ -13,3 +13,7 @@
 
 # Output binaries
 bin
+
+# Editor files
+*.sw?
+.vscode
