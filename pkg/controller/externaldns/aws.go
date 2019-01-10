@@ -8,6 +8,7 @@ import (
 	kubeclient "k8s.io/client-go/kubernetes"
 
 	configv1 "github.com/openshift/api/config/v1"
+	installertypes "github.com/openshift/installer/pkg/types"
 )
 
 const (
@@ -15,18 +16,20 @@ const (
 	awsCredsName      = "aws-creds"
 )
 
-func newAWSProvider(client kubeclient.Interface, namespace string, dnsConfig *configv1.DNS, clusterVersionConfig *configv1.ClusterVersion) provider {
+func newAWSProvider(client kubeclient.Interface, namespace string, installConfig *installertypes.InstallConfig, dnsConfig *configv1.DNS, clusterVersionConfig *configv1.ClusterVersion) provider {
 	return &AWSProvider{
 		namespace:            namespace,
 		dnsConfig:            dnsConfig,
 		clusterVersionConfig: clusterVersionConfig,
 		client:               client,
+		installConfig:        installConfig,
 	}
 }
 
 type AWSProvider struct {
 	dnsConfig            *configv1.DNS
 	clusterVersionConfig *configv1.ClusterVersion
+	installConfig        *installertypes.InstallConfig
 	client               kubeclient.Interface
 	namespace            string
 }
@@ -78,7 +81,7 @@ func (p *AWSProvider) Env() []corev1.EnvVar {
 func (p *AWSProvider) Args() []string {
 	return []string{
 		"--provider=aws",
-		fmt.Sprintf("--domain-filter=%s", p.dnsConfig.Spec.BaseDomain),
+		fmt.Sprintf("--domain-filter=%s", p.installConfig.BaseDomain),
 		"--aws-zone-type=private",
 		fmt.Sprintf("--aws-zone-tags=openshiftClusterID=%s", p.clusterVersionConfig.Spec.ClusterID),
 	}

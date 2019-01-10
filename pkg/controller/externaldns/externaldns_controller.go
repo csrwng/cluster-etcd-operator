@@ -129,14 +129,19 @@ func newReconciler(mgr manager.Manager) (*ReconcileEtcdConfig, error) {
 	installConfig, err := getInstallConfig(kubeClient)
 	if err != nil {
 		log.WithError(err).Error("failed to get installconfig")
+		return nil, err
 	}
 
 	// Retrieve DNS config
-	dnsConfig, err := configClient.ConfigV1().DNSs().Get("cluster", metav1.GetOptions{})
-	if err != nil {
-		log.WithError(err).Error("failed to get dns 'cluster'")
-		return nil, err
-	}
+	dnsConfig := &configv1.DNS{}
+	// TODO: Use this when client issue is resolved.
+	/*
+		err = mgr.GetClient().Get(context.TODO(), types.NamespacedName{Name: "cluster"}, dnsConfig)
+		if err != nil {
+			log.WithError(err).Error("failed to get dns config")
+			return nil, err
+		}
+	*/
 
 	// Retrieve the typed cluster version config.
 	clusterVersionConfig, err := configClient.ConfigV1().ClusterVersions().Get("version", metav1.GetOptions{})
@@ -149,6 +154,7 @@ func newReconciler(mgr manager.Manager) (*ReconcileEtcdConfig, error) {
 	provider, err := getProvider(kubeClient, targetNamespace, installConfig, dnsConfig, clusterVersionConfig)
 	if err != nil {
 		log.WithError(err).Error("failed to setup provider")
+		return nil, err
 	}
 
 	return &ReconcileEtcdConfig{
@@ -348,6 +354,7 @@ func (r *ReconcileEtcdConfig) syncEtcdDNS(config *etcdv1.EtcdConfig) error {
 
 	config.Status.ObservedGeneration = config.ObjectMeta.Generation
 	config.Status.ReadyReplicas = actualDeployment.Status.ReadyReplicas
+	config.Status.Version = "1.0.0"
 	resourcemerge.SetDeploymentGeneration(&config.Status.Generations, actualDeployment)
 	if len(errs) > 0 {
 		message := ""
@@ -421,7 +428,7 @@ func getInstallConfig(client kubeclient.Interface) (*installertypes.InstallConfi
 func getProvider(client kubeclient.Interface, namespace string, installConfig *installertypes.InstallConfig, dnsConfig *configv1.DNS, clusterVersionConfig *configv1.ClusterVersion) (provider, error) {
 	switch {
 	case installConfig.Platform.AWS != nil:
-		return newAWSProvider(client, namespace, dnsConfig, clusterVersionConfig), nil
+		return newAWSProvider(client, namespace, installConfig, dnsConfig, clusterVersionConfig), nil
 	}
 	return nil, fmt.Errorf("Platform is unsupported")
 }

@@ -29,7 +29,7 @@ vet:
 
 # Install manifests on cluster
 install:
-	kubectl apply -f ./config/crds
+	kubectl apply -f ./config/crds/etcd_v1_etcdconfig.yaml
 
 # Generate code
 generate: generate-bindata generate-crds

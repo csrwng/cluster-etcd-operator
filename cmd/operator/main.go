@@ -41,6 +41,7 @@ import (
 
 	clusterapis "sigs.k8s.io/cluster-api/pkg/apis"
 
+	configv1 "github.com/openshift/api/config/v1"
 	"github.com/openshift/cluster-etcd-operator/pkg/apis"
 	"github.com/openshift/cluster-etcd-operator/pkg/controller"
 )
@@ -68,8 +69,9 @@ const defaultLogLevel = "info"
 func NewOperatorManagerCommand() *cobra.Command {
 	var logLevel string
 	cmd := &cobra.Command{
-		Use:   "manager",
-		Short: "OpenShift Master DNS operator",
+		Use:          "manager",
+		Short:        "OpenShift Master DNS operator",
+		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Set log level
 			level, err := log.ParseLevel(logLevel)
@@ -125,6 +127,10 @@ func runOperator() error {
 	if err := clusterapis.AddToScheme(mgr.GetScheme()); err != nil {
 		log.WithError(err).Error("error registering cluster-api types")
 		return err
+	}
+
+	if err := configv1.Install(mgr.GetScheme()); err != nil {
+		log.WithError(err).Error("error registering config types")
 	}
 
 	// Setup all Controllers
